@@ -18,25 +18,18 @@ st.set_page_config(
 # --- Custom CSS for stunning styling ---
 st.markdown("""
     <style>
-    /* Import Google Fonts */
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
-    /* Main Background Gradient */
     .main {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         font-family: 'Poppins', sans-serif;
     }
 
-    /* Sidebar Styling */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
     }
+    [data-testid="stSidebar"] * { color: white !important; }
 
-    [data-testid="stSidebar"] * {
-        color: white !important;
-    }
-
-    /* Card/Block styling */
     [data-testid="stVerticalBlock"] > [style*="flex-direction: column;"] > [data-testid="stVerticalBlock"] {
         background: rgba(255, 255, 255, 0.95);
         border-radius: 20px;
@@ -45,7 +38,6 @@ st.markdown("""
         backdrop-filter: blur(10px);
     }
 
-    /* Headers */
     h1 {
         color: white !important;
         font-weight: 700 !important;
@@ -53,7 +45,6 @@ st.markdown("""
         text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
         font-size: 3.5em !important;
         margin-bottom: 10px !important;
-        animation: fadeInDown 0.8s ease;
     }
 
     h2, h3 {
@@ -64,20 +55,14 @@ st.markdown("""
         margin-top: 20px !important;
     }
 
-    h4 {
-        color: #764ba2 !important;
-        font-weight: 600 !important;
-    }
-
-    /* Input fields */
     .stTextInput > div > div > input,
     .stNumberInput > div > div > input,
     .stSelectbox > div > div > select {
         border: 2px solid #e0e0e0 !important;
         border-radius: 10px !important;
         font-size: 1em !important;
-        transition: all 0.3s ease !important;
         padding: 10px !important;
+        transition: all 0.3s ease !important;
     }
 
     .stTextInput > div > div > input:focus,
@@ -87,31 +72,18 @@ st.markdown("""
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2) !important;
     }
 
-    /* Labels */
-    .stTextInput > label,
-    .stNumberInput > label,
-    .stSelectbox > label,
-    .stFileUploader > label {
-        font-weight: 600 !important;
-        font-size: 1em !important;
-        color: #333 !important;
-    }
-
-    /* Button */
     .stButton > button {
         width: 100%;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
         color: white !important;
         border: none !important;
         border-radius: 15px !important;
-        padding: 20px !important;
-        font-size: 1.4em !important;
+        padding: 15px !important;
+        font-size: 1.2em !important;
         font-weight: 700 !important;
-        text-transform: uppercase;
-        letter-spacing: 1px;
         box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4) !important;
         transition: all 0.3s ease !important;
-        margin-top: 30px !important;
+        margin-top: 20px !important;
     }
 
     .stButton > button:hover {
@@ -119,23 +91,6 @@ st.markdown("""
         box-shadow: 0 12px 30px rgba(102, 126, 234, 0.6) !important;
     }
 
-    .stButton > button:active {
-        transform: translateY(-1px) !important;
-    }
-
-    /* Metrics */
-    [data-testid="stMetricValue"] {
-        font-size: 1.8em !important;
-        font-weight: 700 !important;
-        color: #667eea !important;
-    }
-
-    [data-testid="stMetricLabel"] {
-        font-weight: 600 !important;
-        color: #666 !important;
-    }
-
-    /* Info/Success/Warning boxes */
     .stAlert {
         border-radius: 15px !important;
         border: none !important;
@@ -143,14 +98,12 @@ st.markdown("""
         font-weight: 500 !important;
     }
 
-    /* Progress bar */
     .stProgress > div > div > div {
         background: linear-gradient(90deg, #667eea 0%, #764ba2 100%) !important;
         border-radius: 10px !important;
         height: 20px !important;
     }
 
-    /* File uploader */
     [data-testid="stFileUploader"] {
         background: rgba(102, 126, 234, 0.05);
         border: 2px dashed #667eea;
@@ -164,120 +117,8 @@ st.markdown("""
         border-color: #764ba2;
     }
 
-    /* Dataframe styling */
-    .dataframe {
-        border-radius: 10px !important;
-        overflow: hidden !important;
-    }
-
-    /* Expander */
-    .streamlit-expanderHeader {
-        background: rgba(102, 126, 234, 0.1) !important;
-        border-radius: 10px !important;
-        font-weight: 600 !important;
-    }
-
-    /* Animations */
-    @keyframes fadeInDown {
-        from {
-            opacity: 0;
-            transform: translateY(-30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @keyframes pulse {
-        0%, 100% {
-            transform: scale(1);
-        }
-        50% {
-            transform: scale(1.05);
-        }
-    }
-
-    /* Step badges */
-    .step-badge {
-        display: inline-block;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 8px 20px;
-        border-radius: 25px;
-        font-size: 0.9em;
-        font-weight: 600;
-        margin-bottom: 15px;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        animation: fadeIn 0.8s ease;
-    }
-
-    /* Log container */
-    .log-entry {
-        background: #f8f9fa;
-        border-left: 4px solid #667eea;
-        padding: 15px;
-        margin: 10px 0;
-        border-radius: 8px;
-        animation: fadeIn 0.5s ease;
-    }
-
-    /* Subtitle styling */
-    .subtitle {
-        color: white !important;
-        text-align: center;
-        font-size: 1.3em !important;
-        margin-bottom: 30px !important;
-        text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
-        animation: fadeInDown 1s ease;
-    }
-
-    /* Hide Streamlit branding */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-
-    /* Metric cards styling */
-    [data-testid="stMetricValue"] > div {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        padding: 15px;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    /* Custom success box */
-    .success-box {
-        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-        color: #155724;
-        border: 3px solid #28a745;
-        border-radius: 20px;
-        padding: 30px;
-        text-align: center;
-        font-size: 1.5em;
-        font-weight: 700;
-        margin: 20px 0;
-        box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
-        animation: pulse 2s infinite;
-    }
-
-    /* Field mapping card */
-    .mapping-card {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-        border-radius: 15px;
-        padding: 20px;
-        margin: 10px 0;
-        border-left: 5px solid #667eea;
-    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -294,8 +135,8 @@ if 'uploaded_file_content' not in st.session_state:
     st.session_state.uploaded_file_content = None
 
 # --- Header with animation ---
-st.markdown('<h1>🤖 Microsoft Forms Auto-Filler</h1>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Automate your form submissions with AI-powered efficiency</p>', unsafe_allow_html=True)
+st.markdown('<h1> Microsoft Forms Auto-Filler</h1>', unsafe_allow_html=True)
+
 st.markdown("<br>", unsafe_allow_html=True)
 
 # --- Step 1: Form URL ---
@@ -365,7 +206,7 @@ if uploaded_file:
             input_mapping = {}
             for i in range(int(num_input_fields)):
                 with st.container():
-                    st.markdown(f"<div class='mapping-card'><b>Input Field {i+1}</b></div>", unsafe_allow_html=True)
+                    st.markdown(f"<b>Input Field {i+1}</b></div>", unsafe_allow_html=True)
                     col_a, col_b = st.columns([2, 1])
                     with col_a:
                         csv_col = st.selectbox(
@@ -394,7 +235,7 @@ if uploaded_file:
             choice_mapping = {}
             for i in range(int(num_choice_fields)):
                 with st.container():
-                    st.markdown(f"<div class='mapping-card'><b>Choice Field {i+1}</b></div>", unsafe_allow_html=True)
+                    st.markdown(f"<b>Choice Field {i+1}</b></div>", unsafe_allow_html=True)
                     col_a, col_b = st.columns([2, 1])
                     with col_a:
                         csv_col = st.selectbox(
@@ -459,7 +300,7 @@ if uploaded_file:
                         
                         for i, row in st.session_state.df.iterrows():
                             with log_container:
-                                st.markdown(f"<div class='log-entry'><b>📝 Processing Entry {i+1}/{total}</b></div>", unsafe_allow_html=True)
+                                st.markdown(f"<b>📝 Processing Entry {i+1}/{total}</b></div>", unsafe_allow_html=True)
                             
                             try:
                                 driver.get(form_url)
@@ -472,8 +313,7 @@ if uploaded_file:
                                         value = str(row[csv_col]) if pd.notna(row[csv_col]) else ""
                                         text_inputs[idx].clear()
                                         text_inputs[idx].send_keys(value)
-                                        with log_container:
-                                            st.success(f"✅ Filled: `{csv_col}` = {value}")
+                                        
                                         time.sleep(0.5)
                                 
                                 # Fill choice fields
@@ -488,8 +328,7 @@ if uploaded_file:
                                             driver.execute_script("arguments[0].scrollIntoView(true);", choice_element)
                                             time.sleep(0.3)
                                             choice_element.click()
-                                            with log_container:
-                                                st.success(f"✅ Selected: `{csv_col}` = {choice_value}")
+                                           
                                             time.sleep(0.5)
                                         except Exception as e:
                                             with log_container:
@@ -502,7 +341,7 @@ if uploaded_file:
                                     )
                                     submit_btn.click()
                                     with log_container:
-                                        st.markdown(f"<div class='success-box'>✅ Submitted Entry {i+1}</div>", unsafe_allow_html=True)
+                                        st.markdown(f"✅ Submitted Entry {i+1}</div>", unsafe_allow_html=True)
                                     time.sleep(2)
                                 except Exception as e:
                                     with log_container:
@@ -515,7 +354,7 @@ if uploaded_file:
                             progress.progress((i + 1) / total)
                         
                         driver.quit()
-                        status_text.markdown("<div class='success-box'>🎉 AUTOMATION COMPLETED!</div>", unsafe_allow_html=True)
+                        status_text.markdown(" AUTOMATION COMPLETED!</div>", unsafe_allow_html=True)
                         st.balloons()
                         
                     except Exception as e:
@@ -535,5 +374,6 @@ st.markdown("""
     <div style='text-align: center; color: white; padding: 30px; font-size: 0.9em;'>
         <p style='font-weight: 600; font-size: 1.1em;'>🤖 Microsoft Forms Auto-Filler</p>
         <p>Built with ❤️ using Streamlit & Selenium</p>
+        <p style='font-size: 0.85em; opacity: 0.8;'>⚠️ Ensure you have proper authorization before automating form submissions.</p>
     </div>
 """, unsafe_allow_html=True)
