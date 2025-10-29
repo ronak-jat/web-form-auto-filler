@@ -1,1 +1,11 @@
-
+Name,Age,StressFrequency,SleepHours,SocialSupport,MentalHealthRating,ExerciseFrequency,PrimaryStressSource,ProfessionalHelp,CopingMechanism
+Rahul Sharma,28,Sometimes,7,Yes,Good,Weekly,Work,No,Exercise
+Priya Patel,24,Often,5,Somewhat,Fair,Occasionally,Studies,Previously,Meditation
+Amit Kumar,32,Rarely,8,Yes,Excellent,Daily,Financial,Never,Yoga
+Sneha Reddy,26,Often,6,Somewhat,Fair,Weekly,Work,Yes,Talking to friends
+Vikram Singh,35,Always,4,No,Poor,Rarely,Relationships,Yes,Therapy sessions
+Ananya Desai,22,Sometimes,7,Yes,Good,Weekly,Studies,No,Reading
+Rohan Gupta,29,Often,5,Somewhat,Fair,Occasionally,Work,Previously,Music
+Kavya Nair,31,Rarely,8,Yes,Excellent,Daily,Financial,Never,Running
+Arjun Mehta,27,Always,4,Not at all,Very Poor,Never,Work,Yes,Medication
+Deepika Joshi,25,Sometimes,6,Yes,Good,Weekly,Studies,No,Journaling
