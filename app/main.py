@@ -374,6 +374,5 @@ st.markdown("""
     <div style='text-align: center; color: white; padding: 30px; font-size: 0.9em;'>
         <p style='font-weight: 600; font-size: 1.1em;'>🤖 Microsoft Forms Auto-Filler</p>
         <p>Built with ❤️ using Streamlit & Selenium</p>
-        <p style='font-size: 0.85em; opacity: 0.8;'>⚠️ Ensure you have proper authorization before automating form submissions.</p>
     </div>
 """, unsafe_allow_html=True)
