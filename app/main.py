@@ -1,0 +1,539 @@
+import streamlit as st
+import pandas as pd
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+import io
+
+# --- Page configuration ---
+st.set_page_config(
+    page_title="Microsoft Forms Auto-Filler",
+    page_icon="🤖",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# --- Custom CSS for stunning styling ---
+st.markdown("""
+    <style>
+    /* Import Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+    /* Main Background Gradient */
+    .main {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* Sidebar Styling */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    }
+
+    [data-testid="stSidebar"] * {
+        color: white !important;
+    }
+
+    /* Card/Block styling */
+    [data-testid="stVerticalBlock"] > [style*="flex-direction: column;"] > [data-testid="stVerticalBlock"] {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+    }
+
+    /* Headers */
+    h1 {
+        color: white !important;
+        font-weight: 700 !important;
+        text-align: center;
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        font-size: 3.5em !important;
+        margin-bottom: 10px !important;
+        animation: fadeInDown 0.8s ease;
+    }
+
+    h2, h3 {
+        color: #667eea !important;
+        font-weight: 600 !important;
+        border-bottom: 3px solid #667eea;
+        padding-bottom: 10px;
+        margin-top: 20px !important;
+    }
+
+    h4 {
+        color: #764ba2 !important;
+        font-weight: 600 !important;
+    }
+
+    /* Input fields */
+    .stTextInput > div > div > input,
+    .stNumberInput > div > div > input,
+    .stSelectbox > div > div > select {
+        border: 2px solid #e0e0e0 !important;
+        border-radius: 10px !important;
+        font-size: 1em !important;
+        transition: all 0.3s ease !important;
+        padding: 10px !important;
+    }
+
+    .stTextInput > div > div > input:focus,
+    .stNumberInput > div > div > input:focus,
+    .stSelectbox > div > div > select:focus {
+        border-color: #667eea !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2) !important;
+    }
+
+    /* Labels */
+    .stTextInput > label,
+    .stNumberInput > label,
+    .stSelectbox > label,
+    .stFileUploader > label {
+        font-weight: 600 !important;
+        font-size: 1em !important;
+        color: #333 !important;
+    }
+
+    /* Button */
+    .stButton > button {
+        width: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 15px !important;
+        padding: 20px !important;
+        font-size: 1.4em !important;
+        font-weight: 700 !important;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4) !important;
+        transition: all 0.3s ease !important;
+        margin-top: 30px !important;
+    }
+
+    .stButton > button:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 12px 30px rgba(102, 126, 234, 0.6) !important;
+    }
+
+    .stButton > button:active {
+        transform: translateY(-1px) !important;
+    }
+
+    /* Metrics */
+    [data-testid="stMetricValue"] {
+        font-size: 1.8em !important;
+        font-weight: 700 !important;
+        color: #667eea !important;
+    }
+
+    [data-testid="stMetricLabel"] {
+        font-weight: 600 !important;
+        color: #666 !important;
+    }
+
+    /* Info/Success/Warning boxes */
+    .stAlert {
+        border-radius: 15px !important;
+        border: none !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+        font-weight: 500 !important;
+    }
+
+    /* Progress bar */
+    .stProgress > div > div > div {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%) !important;
+        border-radius: 10px !important;
+        height: 20px !important;
+    }
+
+    /* File uploader */
+    [data-testid="stFileUploader"] {
+        background: rgba(102, 126, 234, 0.05);
+        border: 2px dashed #667eea;
+        border-radius: 10px;
+        padding: 15px;
+        transition: all 0.3s ease;
+    }
+
+    [data-testid="stFileUploader"]:hover {
+        background: rgba(102, 126, 234, 0.1);
+        border-color: #764ba2;
+    }
+
+    /* Dataframe styling */
+    .dataframe {
+        border-radius: 10px !important;
+        overflow: hidden !important;
+    }
+
+    /* Expander */
+    .streamlit-expanderHeader {
+        background: rgba(102, 126, 234, 0.1) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    /* Step badges */
+    .step-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-size: 0.9em;
+        font-weight: 600;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        animation: fadeIn 0.8s ease;
+    }
+
+    /* Log container */
+    .log-entry {
+        background: #f8f9fa;
+        border-left: 4px solid #667eea;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        animation: fadeIn 0.5s ease;
+    }
+
+    /* Subtitle styling */
+    .subtitle {
+        color: white !important;
+        text-align: center;
+        font-size: 1.3em !important;
+        margin-bottom: 30px !important;
+        text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+        animation: fadeInDown 1s ease;
+    }
+
+    /* Hide Streamlit branding */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+
+    /* Metric cards styling */
+    [data-testid="stMetricValue"] > div {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Custom success box */
+    .success-box {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        color: #155724;
+        border: 3px solid #28a745;
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        font-size: 1.5em;
+        font-weight: 700;
+        margin: 20px 0;
+        box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+        animation: pulse 2s infinite;
+    }
+
+    /* Field mapping card */
+    .mapping-card {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+        border-radius: 15px;
+        padding: 20px;
+        margin: 10px 0;
+        border-left: 5px solid #667eea;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Initialize session state
+if 'df' not in st.session_state:
+    st.session_state.df = None
+if 'input_mapping' not in st.session_state:
+    st.session_state.input_mapping = {}
+if 'choice_mapping' not in st.session_state:
+    st.session_state.choice_mapping = {}
+if 'excel_sheets' not in st.session_state:
+    st.session_state.excel_sheets = None
+if 'uploaded_file_content' not in st.session_state:
+    st.session_state.uploaded_file_content = None
+
+# --- Header with animation ---
+st.markdown('<h1>🤖 Microsoft Forms Auto-Filler</h1>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Automate your form submissions with AI-powered efficiency</p>', unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
+
+# --- Step 1: Form URL ---
+st.markdown("### Enter Your Microsoft Forms URL")
+form_url = st.text_input(
+    "Form URL",
+    placeholder="https://forms.office.com/...",
+    help="Paste your Microsoft Forms URL here",
+    label_visibility="collapsed"
+)
+
+# --- Step 2: Upload Data File ---
+st.markdown("### Upload Your Data File")
+uploaded_file = st.file_uploader(
+    "Upload CSV or Excel file",
+    type=["csv", "xlsx", "xls"],
+    help="Upload your data file containing form responses",
+    label_visibility="collapsed"
+)
+
+if uploaded_file:
+    # Store file content for multiple reads
+    if st.session_state.uploaded_file_content is None or uploaded_file.name != st.session_state.get('uploaded_file_name'):
+        st.session_state.uploaded_file_content = uploaded_file.read()
+        st.session_state.uploaded_file_name = uploaded_file.name
+        uploaded_file.seek(0)
+    
+    # Handle CSV files
+    if uploaded_file.name.endswith('.csv'):
+        st.session_state.df = pd.read_csv(io.BytesIO(st.session_state.uploaded_file_content))
+        st.session_state.excel_sheets = None
+        st.success("✅ CSV file loaded successfully!")
+    
+    # Handle Excel files
+    elif uploaded_file.name.endswith(('.xlsx', '.xls')):
+        try:
+            st.session_state.df = pd.read_excel(io.BytesIO(st.session_state.uploaded_file_content))
+            st.session_state.excel_sheets = None
+            st.success("✅ Excel file loaded successfully!")
+                
+        except Exception as e:
+            st.error(f"❌ Error reading Excel file: {e}")
+            st.session_state.df = None
+
+    # Display data preview
+    if st.session_state.df is not None:
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("#### 📄 Data Preview")
+        
+        col1, col2, col3 = st.columns([2, 1, 3])
+        with col1:
+            preview_rows = st.slider("Preview rows", min_value=3, max_value=min(50, len(st.session_state.df)), value=min(5, len(st.session_state.df)))
+        
+        st.dataframe(st.session_state.df.head(preview_rows), use_container_width=True)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # --- Step 3: Field Configuration ---
+        st.markdown("### Configure Field Mappings")
+        
+        col1, col2 = st.columns(2, gap="large")
+        
+        with col1:
+            st.markdown("#### 📝 Text Input Fields")
+            st.info("Map columns to text input boxes (Name, Age, Email, etc.)")
+            num_input_fields = st.number_input("Number of text fields", min_value=0, max_value=20, value=0, step=1)
+            input_mapping = {}
+            for i in range(int(num_input_fields)):
+                with st.container():
+                    st.markdown(f"<div class='mapping-card'><b>Input Field {i+1}</b></div>", unsafe_allow_html=True)
+                    col_a, col_b = st.columns([2, 1])
+                    with col_a:
+                        csv_col = st.selectbox(
+                            f"Column",
+                            options=[""] + list(st.session_state.df.columns),
+                            key=f"input_csv_{i}",
+                            label_visibility="collapsed"
+                        )
+                    with col_b:
+                        order = st.number_input(
+                            f"Order",
+                            min_value=1,
+                            max_value=20,
+                            value=i+1,
+                            key=f"input_order_{i}",
+                            label_visibility="collapsed"
+                        )
+                    if csv_col:
+                        input_mapping[csv_col] = {"order": order, "type": "input"}
+            st.session_state.input_mapping = input_mapping
+
+        with col2:
+            st.markdown("#### ☑️ Choice Fields")
+            st.info("Map columns to radio buttons or checkboxes (Gender, Status, etc.)")
+            num_choice_fields = st.number_input("Number of choice fields", min_value=0, max_value=20, value=0, step=1)
+            choice_mapping = {}
+            for i in range(int(num_choice_fields)):
+                with st.container():
+                    st.markdown(f"<div class='mapping-card'><b>Choice Field {i+1}</b></div>", unsafe_allow_html=True)
+                    col_a, col_b = st.columns([2, 1])
+                    with col_a:
+                        csv_col = st.selectbox(
+                            f"Column",
+                            options=[""] + list(st.session_state.df.columns),
+                            key=f"choice_csv_{i}",
+                            label_visibility="collapsed"
+                        )
+                    with col_b:
+                        order = st.number_input(
+                            f"Order",
+                            min_value=1,
+                            max_value=20,
+                            value=i+1,
+                            key=f"choice_order_{i}",
+                            label_visibility="collapsed"
+                        )
+                    if csv_col:
+                        choice_mapping[csv_col] = {"order": order, "type": "choice"}
+            st.session_state.choice_mapping = choice_mapping
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # --- Step 4: Summary and Start ---
+        
+        st.markdown("### Review Configuration & Start")
+        
+        if st.session_state.input_mapping or st.session_state.choice_mapping:
+            col1, col2 = st.columns(2, gap="large")
+            
+            with col1:
+                st.markdown("#### 📋 Text Input Mappings")
+                sorted_inputs = sorted(st.session_state.input_mapping.items(), key=lambda x: x[1]['order'])
+                for idx, (col, info) in enumerate(sorted_inputs, 1):
+                    st.markdown(f"**{idx}.** `{col}`")
+            
+            with col2:
+                st.markdown("#### 📋 Choice Field Mappings")
+                sorted_choices = sorted(st.session_state.choice_mapping.items(), key=lambda x: x[1]['order'])
+                for idx, (col, info) in enumerate(sorted_choices, 1):
+                    st.markdown(f"**{idx}.** `{col}`")
+            
+            # Start Button
+            if st.button("🚀 START AUTOMATION", type="primary"):
+                if not form_url:
+                    st.error("❌ Please enter the form URL first.")
+                else:
+                    progress = st.progress(0)
+                    status_text = st.empty()
+                    log_container = st.container()
+                    
+                    try:
+                        with st.spinner('🔄 Initializing browser...'):
+                            driver = webdriver.Chrome()
+                            driver.maximize_window()
+                        
+                        total = len(st.session_state.df)
+                        status_text.info(f"🔄 Processing {total} entries...")
+                        
+                        sorted_inputs = sorted(st.session_state.input_mapping.items(), key=lambda x: x[1]['order'])
+                        sorted_choices = sorted(st.session_state.choice_mapping.items(), key=lambda x: x[1]['order'])
+                        
+                        for i, row in st.session_state.df.iterrows():
+                            with log_container:
+                                st.markdown(f"<div class='log-entry'><b>📝 Processing Entry {i+1}/{total}</b></div>", unsafe_allow_html=True)
+                            
+                            try:
+                                driver.get(form_url)
+                                time.sleep(3)
+                                
+                                # Fill text inputs
+                                text_inputs = driver.find_elements(By.CSS_SELECTOR, "input[data-automation-id='textInput']")
+                                for idx, (csv_col, info) in enumerate(sorted_inputs):
+                                    if idx < len(text_inputs):
+                                        value = str(row[csv_col]) if pd.notna(row[csv_col]) else ""
+                                        text_inputs[idx].clear()
+                                        text_inputs[idx].send_keys(value)
+                                        with log_container:
+                                            st.success(f"✅ Filled: `{csv_col}` = {value}")
+                                        time.sleep(0.5)
+                                
+                                # Fill choice fields
+                                for idx, (csv_col, info) in enumerate(sorted_choices):
+                                    if pd.notna(row[csv_col]):
+                                        choice_value = str(row[csv_col]).strip().capitalize()
+                                        try:
+                                            choice_element = driver.find_element(
+                                                By.XPATH,
+                                                f"//div[contains(@role,'radio') or contains(@role,'checkbox')]//span[normalize-space()='{choice_value}']"
+                                            )
+                                            driver.execute_script("arguments[0].scrollIntoView(true);", choice_element)
+                                            time.sleep(0.3)
+                                            choice_element.click()
+                                            with log_container:
+                                                st.success(f"✅ Selected: `{csv_col}` = {choice_value}")
+                                            time.sleep(0.5)
+                                        except Exception as e:
+                                            with log_container:
+                                                st.warning(f"⚠️ Could not select '{choice_value}' for {csv_col}")
+                                
+                                # Submit form
+                                try:
+                                    submit_btn = WebDriverWait(driver, 5).until(
+                                        EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-automation-id='submitButton']"))
+                                    )
+                                    submit_btn.click()
+                                    with log_container:
+                                        st.markdown(f"<div class='success-box'>✅ Submitted Entry {i+1}</div>", unsafe_allow_html=True)
+                                    time.sleep(2)
+                                except Exception as e:
+                                    with log_container:
+                                        st.error(f"❌ Could not submit: {e}")
+                                        
+                            except Exception as e:
+                                with log_container:
+                                    st.error(f"❌ Error in entry {i+1}: {e}")
+                            
+                            progress.progress((i + 1) / total)
+                        
+                        driver.quit()
+                        status_text.markdown("<div class='success-box'>🎉 AUTOMATION COMPLETED!</div>", unsafe_allow_html=True)
+                        st.balloons()
+                        
+                    except Exception as e:
+                        st.error(f"❌ Fatal error: {e}")
+                        try:
+                            driver.quit()
+                        except:
+                            pass
+        else:
+            st.warning("⚠️ Please configure at least one field mapping in Step 3.")
+else:
+    st.info("👆 Upload a CSV or Excel file to begin configuration.")
+
+# --- Footer ---
+st.markdown("---")
+st.markdown("""
+    <div style='text-align: center; color: white; padding: 30px; font-size: 0.9em;'>
+        <p style='font-weight: 600; font-size: 1.1em;'>🤖 Microsoft Forms Auto-Filler</p>
+        <p>Built with ❤️ using Streamlit & Selenium</p>
+    </div>
+""", unsafe_allow_html=True)
