@@ -4,7 +4,8 @@ An Streamlit-based web application that automates Microsoft Forms submissions us
 Upload your CSV or Excel file, map fields visually, and let the bot handle the submissions — all with a stunning UI and smooth automation flow.
 
 ---
-<img width="1919" height="1023" alt="image" src="https://github.com/user-attachments/assets/5b1fc554-8ec4-4a02-acad-633c6f98a152" />
+<img width="1919" height="1021" alt="image" src="https://github.com/user-attachments/assets/a8f428a0-d9dc-463f-af4c-8ba54d097415" />
+
 
 ## 🌟 Features
 
@@ -51,8 +52,12 @@ Demo form link :
 https://forms.office.com/r/gpyV7XZdn2
 
 ---
-<img width="1919" height="1020" alt="image" src="https://github.com/user-attachments/assets/73a68996-2ff2-40b2-8103-a0a995d8a0e4" />
+<img width="1919" height="1022" alt="image" src="https://github.com/user-attachments/assets/e4070a7e-bed3-4a4b-aa76-be1396e03b59" />
 
 ---
 
-<img width="1919" height="1020" alt="image" src="https://github.com/user-attachments/assets/dd3c6219-a441-41f4-82ca-47d89d9398f9" />
+<img width="1919" height="1022" alt="image" src="https://github.com/user-attachments/assets/49960d67-3989-4a08-978c-4af10f301292" />
+
+---
+
+<img width="1919" height="1022" alt="image" src="https://github.com/user-attachments/assets/0b0b4eed-c408-4c43-973f-fa35d9bbf36e" />
