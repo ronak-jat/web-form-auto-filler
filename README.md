@@ -8,20 +8,30 @@ Upload your CSV or Excel file, map fields visually, and let the bot handle the s
 
 Here's a look at the application's user interface.
 
-<img width="1919" height="1021" alt="image" src="https://github.com/user-attachments/assets/a8f428a0-d9dc-463f-af4c-8ba54d097415" />
+*URL and Data Upload*
+
+<img width="1915" height="929" alt="image" src="https://github.com/user-attachments/assets/33e078fa-3e8c-4a3b-99f4-6dc3d4fafb80" />
+
 
 ---
-<img width="1919" height="1022" alt="image" src="https://github.com/user-attachments/assets/e4070a7e-bed3-4a4b-aa76-be1396e03b59" />
+*Data Preview*
+<img width="1911" height="532" alt="image" src="https://github.com/user-attachments/assets/cc6b8ae0-0236-434e-837d-94f19711f4ed" />
+
 
 ---
+*Browser Mode*
+<img width="1916" height="623" alt="image" src="https://github.com/user-attachments/assets/b05de5ab-4d45-4a62-ad30-5bd6335af763" />
 
-<img width="1919" height="1022" alt="image" src="https://github.com/user-attachments/assets/49960d67-3989-4a08-978c-4af10f301292" />
 
 ---
+*Field Mappings*
+<img width="1917" height="934" alt="image" src="https://github.com/user-attachments/assets/7c6bc406-130f-4d86-ac64-fb54a7677f64" />
 
-<img width="1919" height="1022" alt="image" src="https://github.com/user-attachments/assets/0b0b4eed-c408-4c43-973f-fa35d9bbf36e" />
+---
+*Automation*
+<img width="1913" height="927" alt="image" src="https://github.com/user-attachments/assets/a211f609-b422-47dc-ac2d-1106f86a3b6f" />
 
-
+---
 ## 🌟 Features
 
 - 📊 CSV and Excel file support
