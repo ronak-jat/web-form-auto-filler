@@ -4,6 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 import time
 import io
 
@@ -24,7 +25,22 @@ st.markdown("""
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         font-family: 'Poppins', sans-serif;
     }
+h2 {
+        color: #667eea !important;
+        font-weight: 600 !important;
+        padding-bottom: 10px;
+        margin-top: 20px !important;
+    }
 
+    h3 {
+        color: #667eea !important;
+        font-weight: 600 !important;
+        padding-bottom: 10px;
+        margin-top: 20px !important;
+        border-bottom: none !important;
+        border: none !important;
+    }
+            
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
     }
@@ -117,6 +133,20 @@ st.markdown("""
         border-color: #764ba2;
     }
 
+    .browser-mode-card {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border: 2px solid #667eea;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 10px 0;
+        transition: all 0.3s ease;
+    }
+
+    .browser-mode-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     </style>
@@ -133,14 +163,16 @@ if 'excel_sheets' not in st.session_state:
     st.session_state.excel_sheets = None
 if 'uploaded_file_content' not in st.session_state:
     st.session_state.uploaded_file_content = None
+if 'browser_mode' not in st.session_state:
+    st.session_state.browser_mode = "visible"
 
 # --- Header with animation ---
-st.markdown('<h1> Microsoft Forms Auto-Filler</h1>', unsafe_allow_html=True)
+st.markdown('<h1 style="color: #cbaacb;"> Microsoft Forms Auto-Filler</h1>', unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
 # --- Step 1: Form URL ---
-st.markdown("### Enter Your Microsoft Forms URL")
+st.markdown("###  Enter Your Microsoft Forms URL")
 form_url = st.text_input(
     "Form URL",
     placeholder="https://forms.office.com/...",
@@ -149,7 +181,7 @@ form_url = st.text_input(
 )
 
 # --- Step 2: Upload Data File ---
-st.markdown("### Upload Your Data File")
+st.markdown("###  Upload Your Data File")
 uploaded_file = st.file_uploader(
     "Upload CSV or Excel file",
     type=["csv", "xlsx", "xls"],
@@ -184,7 +216,7 @@ if uploaded_file:
     # Display data preview
     if st.session_state.df is not None:
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("#### 📄 Data Preview")
+        st.markdown("####  Data Preview")
         
         col1, col2, col3 = st.columns([2, 1, 3])
         with col1:
@@ -194,92 +226,115 @@ if uploaded_file:
         
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # --- Step 3: Field Configuration ---
-        st.markdown("### Configure Field Mappings")
+        # --- Browser Mode Selection ---
+        st.markdown("###  Browser Mode Selection")
         
         col1, col2 = st.columns(2, gap="large")
         
         with col1:
-            st.markdown("#### 📝 Text Input Fields")
+            st.markdown("""
+                <div class='browser-mode-card'>
+                    <h4 style='color: #667eea; margin-top: 0;'>👁️ Visible Mode</h4>
+                    <p><strong>Watch the automation in action!</strong></p>
+                    <ul>
+                        <li>See forms being filled in real-time</li>
+                        <li>Better for debugging and verification</li>
+                    </ul>
+                </div>
+            """, unsafe_allow_html=True)
+            if st.button(" Use Visible Mode", key="visible_btn", use_container_width=True):
+                st.session_state.browser_mode = "visible"
+                st.success("✅ Visible mode selected!")
+        
+        with col2:
+            st.markdown("""
+                <div class='browser-mode-card'>
+                    <h4 style='color: #764ba2; margin-top: 0;'>⚡ Headless Mode</h4>
+                    <p><strong>Fast background processing!</strong></p>
+                    <ul>
+                        <li>Runs in the background (no browser window)</li>
+                        <li>Faster automation speed</li>
+                    </ul>
+                </div>
+            """, unsafe_allow_html=True)
+            if st.button(" Use Headless Mode", key="headless_btn", use_container_width=True):
+                st.session_state.browser_mode = "headless"
+                st.success("✅ Headless mode selected!")
+        
+        # Display current mode
+        mode_emoji = "👁️" if st.session_state.browser_mode == "visible" else "⚡"
+        mode_text = "Visible" if st.session_state.browser_mode == "visible" else "Headless"
+        st.info(f"{mode_emoji} **Current Mode:** {mode_text} Mode")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # --- Step 3: Field Configuration ---
+        st.markdown("###  Configure Field Mappings")
+        
+        col1, col2 = st.columns(2, gap="large")
+        
+        with col1:
+            st.markdown("####  Text Input Fields")
             st.info("Map columns to text input boxes (Name, Age, Email, etc.)")
             num_input_fields = st.number_input("Number of text fields", min_value=0, max_value=20, value=0, step=1)
             input_mapping = {}
             for i in range(int(num_input_fields)):
                 with st.container():
                     st.markdown(f"<b>Input Field {i+1}</b></div>", unsafe_allow_html=True)
-                    col_a, col_b = st.columns([2, 1])
-                    with col_a:
-                        csv_col = st.selectbox(
-                            f"Column",
-                            options=[""] + list(st.session_state.df.columns),
-                            key=f"input_csv_{i}",
-                            label_visibility="collapsed"
-                        )
-                    with col_b:
-                        order = st.number_input(
-                            f"Order",
-                            min_value=1,
-                            max_value=20,
-                            value=i+1,
-                            key=f"input_order_{i}",
-                            label_visibility="collapsed"
-                        )
+                    csv_col = st.selectbox(
+                        f"Column",
+                        options=[""] + list(st.session_state.df.columns),
+                        key=f"input_csv_{i}",
+                        label_visibility="collapsed"
+                    )
                     if csv_col:
-                        input_mapping[csv_col] = {"order": order, "type": "input"}
+                        input_mapping[csv_col] = {"order": i+1, "type": "input"}
             st.session_state.input_mapping = input_mapping
 
         with col2:
-            st.markdown("#### ☑️ Choice Fields")
+            st.markdown("####  Choice Fields")
             st.info("Map columns to radio buttons or checkboxes (Gender, Status, etc.)")
             num_choice_fields = st.number_input("Number of choice fields", min_value=0, max_value=20, value=0, step=1)
             choice_mapping = {}
             for i in range(int(num_choice_fields)):
                 with st.container():
                     st.markdown(f"<b>Choice Field {i+1}</b></div>", unsafe_allow_html=True)
-                    col_a, col_b = st.columns([2, 1])
-                    with col_a:
-                        csv_col = st.selectbox(
-                            f"Column",
-                            options=[""] + list(st.session_state.df.columns),
-                            key=f"choice_csv_{i}",
-                            label_visibility="collapsed"
-                        )
-                    with col_b:
-                        order = st.number_input(
-                            f"Order",
-                            min_value=1,
-                            max_value=20,
-                            value=i+1,
-                            key=f"choice_order_{i}",
-                            label_visibility="collapsed"
-                        )
+                    csv_col = st.selectbox(
+                        f"Column",
+                        options=[""] + list(st.session_state.df.columns),
+                        key=f"choice_csv_{i}",
+                        label_visibility="collapsed"
+                    )
                     if csv_col:
-                        choice_mapping[csv_col] = {"order": order, "type": "choice"}
+                        choice_mapping[csv_col] = {"order": i+1, "type": "choice"}
             st.session_state.choice_mapping = choice_mapping
 
         st.markdown("<br>", unsafe_allow_html=True)
         
         # --- Step 4: Summary and Start ---
         
-        st.markdown("### Review Configuration & Start")
+        st.markdown("###  Review Configuration & Start")
         
         if st.session_state.input_mapping or st.session_state.choice_mapping:
             col1, col2 = st.columns(2, gap="large")
             
             with col1:
-                st.markdown("#### 📋 Text Input Mappings")
+                st.markdown("####  Text Input Mappings")
                 sorted_inputs = sorted(st.session_state.input_mapping.items(), key=lambda x: x[1]['order'])
                 for idx, (col, info) in enumerate(sorted_inputs, 1):
                     st.markdown(f"**{idx}.** `{col}`")
             
             with col2:
-                st.markdown("#### 📋 Choice Field Mappings")
+                st.markdown("####  Choice Field Mappings")
                 sorted_choices = sorted(st.session_state.choice_mapping.items(), key=lambda x: x[1]['order'])
                 for idx, (col, info) in enumerate(sorted_choices, 1):
                     st.markdown(f"**{idx}.** `{col}`")
             
             # Start Button
-            if st.button("🚀 START AUTOMATION", type="primary"):
+            mode_emoji = "👁️" if st.session_state.browser_mode == "visible" else "⚡"
+            button_text = f"{mode_emoji} START AUTOMATION ({st.session_state.browser_mode.upper()} MODE)"
+            
+            if st.button(button_text, type="primary"):
                 if not form_url:
                     st.error("❌ Please enter the form URL first.")
                 else:
@@ -288,16 +343,30 @@ if uploaded_file:
                     log_container = st.container()
                     
                     try:
-                        with st.spinner('🔄 Initializing browser...'):
-                            driver = webdriver.Chrome()
-                            driver.maximize_window()
+                        # Configure Chrome options based on mode
+                        chrome_options = Options()
+                        
+                        if st.session_state.browser_mode == "headless":
+                            chrome_options.add_argument("--headless")
+                            chrome_options.add_argument("--disable-gpu")
+                            chrome_options.add_argument("--no-sandbox")
+                            chrome_options.add_argument("--disable-dev-shm-usage")
+                            chrome_options.add_argument("--window-size=1920,1080")
+                            with st.spinner('⚡ Initializing headless browser...'):
+                                driver = webdriver.Chrome(options=chrome_options)
+                            status_text.info(f"⚡ Running in headless mode (background)")
+                        else:
+                            with st.spinner('🔄 Initializing visible browser...'):
+                                driver = webdriver.Chrome(options=chrome_options)
+                                driver.maximize_window()
+                            status_text.info(f"👁️ Running in visible mode (you can watch the automation)")
                         
                         total = len(st.session_state.df)
-                        status_text.info(f"🔄 Processing {total} entries...")
                         
                         sorted_inputs = sorted(st.session_state.input_mapping.items(), key=lambda x: x[1]['order'])
                         sorted_choices = sorted(st.session_state.choice_mapping.items(), key=lambda x: x[1]['order'])
                         
+                        automation_stopped = False
                         for i, row in st.session_state.df.iterrows():
                             with log_container:
                                 st.markdown(f"<b>📝 Processing Entry {i+1}/{total}</b></div>", unsafe_allow_html=True)
@@ -344,18 +413,39 @@ if uploaded_file:
                                         st.markdown(f"✅ Submitted Entry {i+1}</div>", unsafe_allow_html=True)
                                     time.sleep(2)
                                 except Exception as e:
-                                    with log_container:
-                                        st.error(f"❌ Could not submit: {e}")
+                                    error_msg = str(e).lower()
+                                    if 'invalid session' in error_msg or 'session deleted' in error_msg:
+                                        with log_container:
+                                            st.error(f"🛑 Browser was closed manually - Automation stopped at entry {i+1}")
+                                        automation_stopped = True
+                                        break
+                                    else:
+                                        with log_container:
+                                            st.error(f"❌ Submit failed for entry {i+1}")
                                         
                             except Exception as e:
-                                with log_container:
-                                    st.error(f"❌ Error in entry {i+1}: {e}")
+                                error_msg = str(e).lower()
+                                if 'invalid session' in error_msg or 'session deleted' in error_msg or 'disconnected' in error_msg:
+                                    with log_container:
+                                        st.error(f"🛑 Browser was closed manually - Automation stopped at entry {i+1}")
+                                    automation_stopped = True
+                                    break
+                                else:
+                                    with log_container:
+                                        st.error(f"❌ Error processing entry {i+1}")
                             
                             progress.progress((i + 1) / total)
                         
-                        driver.quit()
-                        status_text.markdown(" AUTOMATION COMPLETED!</div>", unsafe_allow_html=True)
-                        st.balloons()
+                        try:
+                            driver.quit()
+                        except:
+                            pass
+                        
+                        if automation_stopped:
+                            status_text.warning("⚠️ Automation stopped - Browser was closed manually")
+                        else:
+                            status_text.markdown("🎉 AUTOMATION COMPLETED!</div>", unsafe_allow_html=True)
+                            st.balloons()
                         
                     except Exception as e:
                         st.error(f"❌ Fatal error: {e}")
@@ -372,7 +462,9 @@ else:
 st.markdown("---")
 st.markdown("""
     <div style='text-align: center; color: white; padding: 30px; font-size: 0.9em;'>
-        <p style='font-weight: 600; font-size: 1.1em;'>🤖 Microsoft Forms Auto-Filler</p>
+        <p style='font-weight: 600; font-size: 1.1em;'> Microsoft Forms Auto-Filler</p>
         <p>Built with ❤️ using Streamlit & Selenium</p>
     </div>
+            
 """, unsafe_allow_html=True)
+
