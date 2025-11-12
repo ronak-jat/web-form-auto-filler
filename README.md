@@ -53,13 +53,19 @@ Here's a look at the application's user interface.
 
 ## 📦 Installation
 
-### 1️⃣ Clone the Repository
+### 1️. Clone the Repository
 ```bash
 git clone https://github.com/<your-username>/microsoft-forms-autofiller.git
 cd microsoft-forms-autofiller
 ```
 
-### 2️⃣ Install Dependencies
+### 2️. Create and activate a virtual environment
+     On Windows:
+        ```bash
+        python -m venv venv
+        .\venv\Scripts\activate
+        ```
+### 3. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
